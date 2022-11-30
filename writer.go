@@ -313,13 +313,19 @@ func (w *Writer) writeEmptyRecord() {
 func (w *Writer) WriteAttribute(row int, field int, value interface{}) error {
 	var buf []byte
 	switch v := value.(type) {
+	case string:
+		buf = []byte(v)
+	case int64:
+		buf = []byte(strconv.Itoa(int(v)))
+	case int32:
+		buf = []byte(strconv.Itoa(int(v)))
 	case int:
 		buf = []byte(strconv.Itoa(v))
 	case float64:
 		precision := w.dbfFields[field].Precision
 		buf = []byte(strconv.FormatFloat(v, 'f', int(precision), 64))
-	case string:
-		buf = []byte(v)
+	case []uint8:
+		buf = v
 	default:
 		return fmt.Errorf("Unsupported value type: %T", v)
 	}
